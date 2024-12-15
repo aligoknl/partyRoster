@@ -1,7 +1,6 @@
-<script lang="ts" setup>
+<script setup>
 import { storeToRefs } from "pinia";
 import { useParticipantStore } from "../stores/participantStore";
-import type { Participant } from "../types/Participant";
 import ProgressSpinner from "primevue/progressspinner";
 import { useToast } from "primevue/usetoast";
 
@@ -9,23 +8,22 @@ const toast = useToast();
 
 const participantStore = useParticipantStore();
 const { participants, isLoading } = storeToRefs(participantStore);
-const onCellEditComplete = async (event: {
-  data: Participant;
-  field: keyof Participant;
-  newValue: string;
-}): Promise<void> => {
+const onCellEditComplete = async (event) => {
   const { data, field, newValue } = event;
 
   if (typeof newValue === "string" && newValue.trim().length > 0) {
     data[field] = newValue;
 
     await participantStore.updateParticipant(data._id, data);
-  } else {
-    event.preventDefault();
   }
+  toast.add({
+    severity: "info",
+    summary: "Updated! Looking forward to it!",
+    life: 3000,
+  });
 };
 
-const deleteParticipant = async (id: string): Promise<void> => {
+const deleteParticipant = async (id) => {
   toast.add({
     severity: "info",
     summary: "Deleted! Maybe next time!",

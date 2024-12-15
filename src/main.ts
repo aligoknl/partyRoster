@@ -13,8 +13,11 @@ import DataTable from "primevue/datatable";
 import Column from "primevue/column";
 import Card from "primevue/card";
 
-import AppState from "./plugins/appState.js";
 import ThemeSwitcher from "./components/ThemeSwitcher.vue";
+
+// @ts-ignore
+import AppState from "./plugins/appState.js";
+// @ts-ignore
 import Noir from "./presets/Noir.js";
 
 import "./style.css";
