@@ -12,6 +12,7 @@ import DialogService from "primevue/dialogservice";
 import DataTable from "primevue/datatable";
 import Column from "primevue/column";
 import Card from "primevue/card";
+import ConfirmDialog from "primevue/confirmdialog";
 
 import ThemeSwitcher from "./components/ThemeSwitcher.vue";
 
@@ -47,6 +48,7 @@ app.component("Message", Message);
 app.component("DataTable", DataTable);
 app.component("Column", Column);
 app.component("Card", Card);
+app.component("ConfirmDialog", ConfirmDialog);
 app.component("ThemeSwitcher", ThemeSwitcher);
 
 app.mount("#app");

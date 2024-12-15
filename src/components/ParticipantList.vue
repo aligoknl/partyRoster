@@ -3,8 +3,10 @@ import { storeToRefs } from "pinia";
 import { useParticipantStore } from "../stores/participantStore";
 import ProgressSpinner from "primevue/progressspinner";
 import { useToast } from "primevue/usetoast";
+import { useConfirm } from "primevue/useconfirm";
 
 const toast = useToast();
+const confirm = useConfirm();
 
 const participantStore = useParticipantStore();
 const { participants, isLoading } = storeToRefs(participantStore);
@@ -33,13 +35,34 @@ const onCellEditComplete = async (event) => {
   }
 };
 
-const deleteParticipant = async (id) => {
-  toast.add({
-    severity: "info",
-    summary: "Deleted! Maybe next time!",
-    life: 3000,
+const confirmDelete = (id) => {
+  confirm.require({
+    message: "Do you want to delete this record?",
+    header: "You are deleting this enrty",
+    icon: "pi pi-info-circle",
+    rejectLabel: "Cancel",
+    rejectProps: {
+      label: "Cancel",
+      severity: "secondary",
+      outlined: true,
+    },
+    acceptProps: {
+      label: "Delete",
+      severity: "danger",
+    },
+    accept: async () => {
+      await deleteParticipant(id);
+      toast.add({
+        severity: "info",
+        summary: "Deleted! Maybe next time!",
+        life: 3000,
+      });
+    },
+    reject: () => {},
   });
+};
 
+const deleteParticipant = async (id) => {
   await participantStore.deleteParticipant(id);
 };
 </script>
@@ -52,6 +75,7 @@ const deleteParticipant = async (id) => {
       </template>
       <span class="ml-2">Party Animals</span>
     </Message>
+    <ConfirmDialog></ConfirmDialog>
     <DataTable
       :value="participants"
       editMode="cell"
@@ -98,7 +122,7 @@ const deleteParticipant = async (id) => {
             label="Delete"
             variant="text"
             class="!text-[green] p-button"
-            @click="deleteParticipant(data._id)"
+            @click="confirmDelete(data._id)"
           />
         </template>
       </Column>
