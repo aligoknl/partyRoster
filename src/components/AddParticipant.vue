@@ -36,6 +36,8 @@ const onFormSubmit = async () => {
     });
 
     localStorage.setItem("hasEnteredData", "true");
+    localStorage.setItem("storedName", name.value);
+    localStorage.setItem("storedItem", item.value);
 
     toast.add({
       severity: "success",

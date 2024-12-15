@@ -10,12 +10,18 @@ const confirm = useConfirm();
 
 const participantStore = useParticipantStore();
 const { participants, isLoading } = storeToRefs(participantStore);
-const onCellEditComplete = async (event) => {
+const onCellEditComplete = async (event, name, item) => {
   const { data, field, newValue } = event;
 
   const hasEnteredData = localStorage.getItem("hasEnteredData");
+  const storedName = localStorage.getItem("storedName");
+  const storedItem = localStorage.getItem("storedItem");
 
-  if (hasEnteredData === "true") {
+  if (
+    hasEnteredData === "true" &&
+    storedName === data.name &&
+    storedItem === data.item
+  ) {
     if (typeof newValue === "string" && newValue.trim().length > 0) {
       data[field] = newValue;
 
