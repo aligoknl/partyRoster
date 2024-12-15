@@ -35,6 +35,8 @@ const onFormSubmit = async () => {
       item: item.value,
     });
 
+    localStorage.setItem("hasEnteredData", "true");
+
     toast.add({
       severity: "success",
       summary: `Thanks for coming ${name.value}, see you at the party!`,

@@ -11,16 +11,26 @@ const { participants, isLoading } = storeToRefs(participantStore);
 const onCellEditComplete = async (event) => {
   const { data, field, newValue } = event;
 
-  if (typeof newValue === "string" && newValue.trim().length > 0) {
-    data[field] = newValue;
+  const hasEnteredData = localStorage.getItem("hasEnteredData");
 
-    await participantStore.updateParticipant(data._id, data);
+  if (hasEnteredData === "true") {
+    if (typeof newValue === "string" && newValue.trim().length > 0) {
+      data[field] = newValue;
+
+      await participantStore.updateParticipant(data._id, data);
+    }
+    toast.add({
+      severity: "info",
+      summary: "Updated! Looking forward to it!",
+      life: 3000,
+    });
+  } else {
+    toast.add({
+      severity: "error",
+      summary: "You must enter this information to edit!",
+      life: 3000,
+    });
   }
-  toast.add({
-    severity: "info",
-    summary: "Updated! Looking forward to it!",
-    life: 3000,
-  });
 };
 
 const deleteParticipant = async (id) => {
