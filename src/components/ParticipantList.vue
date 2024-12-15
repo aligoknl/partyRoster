@@ -1,0 +1,146 @@
+<script lang="ts" setup>
+import { storeToRefs } from "pinia";
+import { useParticipantStore } from "../stores/participantStore";
+import type { Participant } from "../types/Participant";
+import ProgressSpinner from "primevue/progressspinner";
+import { useToast } from "primevue/usetoast";
+
+const toast = useToast();
+
+const participantStore = useParticipantStore();
+const { participants, isLoading } = storeToRefs(participantStore);
+const onCellEditComplete = async (event: {
+  data: Participant;
+  field: keyof Participant;
+  newValue: string;
+}): Promise<void> => {
+  const { data, field, newValue } = event;
+
+  if (typeof newValue === "string" && newValue.trim().length > 0) {
+    data[field] = newValue;
+
+    await participantStore.updateParticipant(data._id, data);
+  } else {
+    event.preventDefault();
+  }
+};
+
+const deleteParticipant = async (id: string): Promise<void> => {
+  toast.add({
+    severity: "info",
+    summary: "Deleted! Maybe next time!",
+    life: 3000,
+  });
+
+  await participantStore.deleteParticipant(id);
+};
+</script>
+
+<template>
+  <div v-if="!isLoading" class="card">
+    <Message severity="success">
+      <template #icon>
+        <i class="pi pi-users"></i>
+      </template>
+      <span class="ml-2">Party Animals</span>
+    </Message>
+    <DataTable
+      :value="participants"
+      editMode="cell"
+      paginator
+      :rows="10"
+      :rowsPerPageOptions="[5, 10, 20, 50]"
+      @cell-edit-complete="onCellEditComplete"
+      :pt="{
+        table: { style: 'min-width: 5rem' },
+        column: {
+          bodycell: ({ state }) => ({
+            class: [{ '!py-0': state['d_editing'] }],
+          }),
+        },
+      }"
+    >
+      <Column
+        field="name"
+        header="NAME"
+        style="width: 40%"
+        headerClass="font-bold"
+      >
+        <template #body="{ data, field }">{{ data[field] }}</template>
+        <template #editor="{ data, field }">
+          <InputText v-model="data[field]" fluid autofocus />
+        </template>
+      </Column>
+
+      <Column
+        field="item"
+        header="BRINGINGS"
+        style="width: 40%"
+        headerClass="font-bold"
+      >
+        <template #body="{ data, field }">{{ data[field] }}</template>
+        <template #editor="{ data, field }">
+          <InputText v-model="data[field]" fluid autofocus />
+        </template>
+      </Column>
+
+      <Column style="width: 10%" bodyClass="text-center">
+        <template #body="{ data }">
+          <Button
+            label="Delete"
+            variant="text"
+            class="!text-[green] p-button"
+            @click="deleteParticipant(data._id)"
+          />
+        </template>
+      </Column>
+      <template
+        #paginatorcontainer="{
+          first,
+          last,
+          page,
+          pageCount,
+          prevPageCallback,
+          nextPageCallback,
+          totalRecords,
+        }"
+      >
+        <div
+          class="flex items-center gap-4 border border-primary bg-transparent rounded-full w-full py-1 px-2 justify-between"
+        >
+          <Button
+            icon="pi pi-chevron-left"
+            rounded
+            text
+            @click="prevPageCallback"
+            :disabled="page === 0"
+          />
+          <div class="text-color font-medium">
+            <span class="hidden sm:block"
+              >Showing {{ first }} to {{ last }} of {{ totalRecords }}</span
+            >
+            <span class="block sm:hidden"
+              >Page {{ page + 1 }} of {{ pageCount }}</span
+            >
+          </div>
+          <Button
+            icon="pi pi-chevron-right"
+            rounded
+            text
+            @click="nextPageCallback"
+            :disabled="page === pageCount - 1"
+          />
+        </div>
+      </template>
+    </DataTable>
+  </div>
+  <div v-else class="card flex justify-center">
+    <ProgressSpinner
+      style="width: 50px; height: 50px"
+      strokeWidth="8"
+      fill="transparent"
+      animationDuration=".5s"
+      aria-label="Custom ProgressSpinner"
+    />
+  </div>
+</template>
